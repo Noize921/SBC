@@ -105,8 +105,6 @@ public class Main extends Application {
                             Charset charset = Charset.forName("Cp1252");
 
                             try (BufferedReader reader = Files.newBufferedReader(path, charset)) {
-                                System.out.println("Here");
-
                                 sourceText = reader.lines()
                                         .map(line -> line.split(SPLITER))
                                         .flatMap(Arrays::stream)
@@ -118,7 +116,6 @@ public class Main extends Application {
                                 System.out.println("Error in file choosing method");
                                 e.printStackTrace();
                             }
-                            System.out.println(f.length());
                         });
         } else {
             infoText.setText("Selection Canceled");
@@ -129,9 +126,6 @@ public class Main extends Application {
         try(Stream<Path> paths = Files.walk(sourcePath)) {
             paths.filter(Files::isRegularFile)
                     .forEach(f -> {
-                        System.out.println(f.getFileName().toString().replace(".txt", ""));
-                        System.out.println();
-
                         Path path = Paths.get(f.toUri());
                         Charset charset = Charset.forName("UTF8");
 
@@ -205,9 +199,5 @@ public class Main extends Application {
         }
     }
 
-    public Text getInfoText() { return this.infoText; }
-    public Set<String> getSourceText() { return this.sourceText; }
-    public List getStatistics() { return this.feelings; }
     public Map<String, List<String>> getFeelingsMap() { return feelingsMap; }
-
 }
