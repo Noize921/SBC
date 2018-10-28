@@ -73,6 +73,7 @@ public class Main extends Application {
         chooseFilesButton.setOnAction(e -> {
             chooseMultipleFiles();
             analyse(this.sourceText, path);
+
         });
 
         infoText = new Text();
