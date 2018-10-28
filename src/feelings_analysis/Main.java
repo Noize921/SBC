@@ -21,10 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,14 +36,14 @@ public class Main extends Application {
     private Text sceneTitle;
     private Text infoText;
 
-    private StringBuilder sourceText = new StringBuilder();
-    private ArrayList<String> anger = new ArrayList<>();
-    private ArrayList<String> disgust = new ArrayList<>();
-    private ArrayList<String> fear = new ArrayList<>();
-    private ArrayList<String> joy = new ArrayList<>();
-    private ArrayList<String> sadness = new ArrayList<>();
-    private ArrayList<String> surprise = new ArrayList<>();
-    private Map<String, String> statistics;
+    private Set<String> sourceText;
+    private List<String> anger;
+    private List<String> disgust;
+    private List<String> fear;
+    private List<String> joy;
+    private List<String> sadness;
+    private List<String> surprise;
+    private List<String> feelings;
 
     public static void main(String[] args) {
         launch(args);
@@ -75,9 +72,7 @@ public class Main extends Application {
 
         chooseFilesButton.setOnAction(e -> {
             chooseMultipleFiles();
-            System.out.println(getSourceText().toString());
-//            analyse(this.sourceText, path);
-//            System.out.println(getStatistics());
+            analyse(this.sourceText, path);
         });
 
         infoText = new Text();
@@ -110,12 +105,12 @@ public class Main extends Application {
                             try (BufferedReader reader = Files.newBufferedReader(path, charset)) {
                                 System.out.println("Here");
 
-                                setSourceText(reader.lines()
+                                sourceText = reader.lines()
                                         .map(line -> line.split(SPLITER))
                                         .flatMap(Arrays::stream)
                                         .map(String::toLowerCase)
-                                        .filter(word -> word.matches("[A-Za-z?-]+"))
-                                        .collect(Collectors.joining(" ")));
+                                        .filter(word -> word.matches("[A-Za-z?-_]+"))
+                                        .collect(Collectors.toCollection(HashSet::new));
 
                             } catch (Exception e) {
                                 System.out.println("Error in file choosing method");
@@ -128,23 +123,64 @@ public class Main extends Application {
         }
     }
 
-    public void analyse(StringBuilder stringBuilder, Path sourcePath) {
+    public void analyse(Set<String> hashSet, Path sourcePath) {
         try(Stream<Path> paths = Files.walk(sourcePath)) {
             paths.filter(Files::isRegularFile)
                     .forEach(f -> {
-//                        System.out.println(f.getFileName().toString().replace(".txt", ""));
+                        System.out.println(f.getFileName().toString().replace(".txt", ""));
+                        System.out.println();
+
                         Path path = Paths.get(f.toUri());
-                        Charset charset = Charset.forName("Cp1252");
+                        Charset charset = Charset.forName("UTF8");
 
                         try(BufferedReader reader = Files.newBufferedReader(path, charset)) {
                             StringBuffer tempStringBuffer = new StringBuffer();
 
-                            statistics = reader.lines()
+                            feelings = reader.lines()
                                     .map(line -> line.split(SPLITER))
                                     .flatMap(Arrays::stream)
                                     .map(String::toLowerCase)
-                                    .filter(word -> word.matches("[A-Za-z?-]+"))
-                                    .collect(Collectors.groupingBy(f.getFileName().toString(), Function.identity()));
+                                    .filter(word -> word.matches("[A-Za-z?-_]+"))
+                                    .collect(Collectors.toList());
+
+                            switch (f.getFileName().toString().replace(".txt", "")) {
+                                case "anger": {
+                                    anger = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+                                }
+
+                                case "disgust": {
+                                    disgust = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+
+                                }
+
+                                case "fear": {
+                                    fear = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+                                }
+
+                                case "joy": {
+                                    joy = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+                                }
+
+                                case "sadness": {
+                                    sadness = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+                                }
+
+                                case "surprise": {
+                                    surprise = hashSet.stream()
+                                            .filter(word -> feelings.contains(word))
+                                            .collect(Collectors.toList());
+                                }
+                            }
 
                         } catch (IOException e) {
                             System.out.println("Error in analysis method");
@@ -157,16 +193,7 @@ public class Main extends Application {
     }
 
     public Text getInfoText() { return this.infoText; }
-    public void setInfoText(String text) { this.infoText.setText(text); }
-    public StringBuilder getSourceText() { return this.sourceText; }
-    public void setSourceText(String str) { this.sourceText.append(str); }
-    public void addToAngerList(String word) { this.anger.add(word); }
-    public void addToDisgustList(String word) { this.disgust.add(word); }
-    public void addToFearList(String word) { this.fear.add(word); }
-    public void addToJoyList(String word) { this.joy.add(word); }
-    public void addToSadnessList(String word) { this.sadness.add(word); }
-    public void addToSurpriseList(String word) { this.surprise.add(word); }
-    public Map<String, String> getStatistics() { return this.statistics; }
-    public String getFileName(Path path) { path.getFileName().toString().replace(".txt", ""); }
+    public Set<String> getSourceText() { return this.sourceText; }
+    public List getStatistics() { return this.feelings; }
 
 }
