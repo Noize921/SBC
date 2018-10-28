@@ -44,6 +44,7 @@ public class Main extends Application {
     private List<String> sadness;
     private List<String> surprise;
     private List<String> feelings;
+    private Map<String, List<String>> feelingsMap = new HashMap<>();
 
     public static void main(String[] args) {
         launch(args);
@@ -73,7 +74,7 @@ public class Main extends Application {
         chooseFilesButton.setOnAction(e -> {
             chooseMultipleFiles();
             analyse(this.sourceText, path);
-
+            StatisticWindow.displayStatistics(getFeelingsMap());
         });
 
         infoText = new Text();
@@ -149,6 +150,8 @@ public class Main extends Application {
                                     anger = hashSet.stream()
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
+
+                                    feelingsMap.put("Anger", anger);
                                 }
 
                                 case "disgust": {
@@ -156,30 +159,39 @@ public class Main extends Application {
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
 
+                                    feelingsMap.put("Disgust", disgust);
                                 }
 
                                 case "fear": {
                                     fear = hashSet.stream()
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
+
+                                    feelingsMap.put("Fear", fear);
                                 }
 
                                 case "joy": {
                                     joy = hashSet.stream()
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
+
+                                    feelingsMap.put("Joy", joy);
                                 }
 
                                 case "sadness": {
                                     sadness = hashSet.stream()
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
+
+                                    feelingsMap.put("Sadness", sadness);
                                 }
 
                                 case "surprise": {
                                     surprise = hashSet.stream()
                                             .filter(word -> feelings.contains(word))
                                             .collect(Collectors.toList());
+
+                                    feelingsMap.put("Surprise", surprise);
                                 }
                             }
 
@@ -196,5 +208,6 @@ public class Main extends Application {
     public Text getInfoText() { return this.infoText; }
     public Set<String> getSourceText() { return this.sourceText; }
     public List getStatistics() { return this.feelings; }
+    public Map<String, List<String>> getFeelingsMap() { return feelingsMap; }
 
 }
